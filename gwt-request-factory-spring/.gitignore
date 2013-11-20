@@ -1,0 +1,9 @@
+# Maven Targets
+target/
+
+# Eclipse Settings
+.settings/
+.metadata/
+bin/
+.classpath
+.factorypath
