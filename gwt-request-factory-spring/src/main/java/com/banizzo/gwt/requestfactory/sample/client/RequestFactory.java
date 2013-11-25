@@ -16,6 +16,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.event.shared.SimpleEventBus;
+import com.banizzo.gwt.requestfactory.sample.shared.UserServiceRequest;
+import com.banizzo.gwt.requestfactory.sample.client.models.UserProxy;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -33,13 +37,18 @@ public class RequestFactory implements EntryPoint {
    * Create a remote service proxy to talk to the server-side Greeting service.
    */
   private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
+  private final UserServiceRequestFactory userServiceRequestFactory = GWT.create(UserServiceRequestFactory.class);
 
   private final Messages messages = GWT.create(Messages.class);
+  //private UserServiceRequest userServiceRequest;
 
   /**
    * This is the entry point method.
    */
   public void onModuleLoad() {
+	
+	userServiceRequestFactory.initialize( new SimpleEventBus() );
+		  
     final Button sendButton = new Button( messages.sendButton() );
     final TextBox nameField = new TextBox();
     nameField.setText( messages.nameField() );
@@ -92,7 +101,18 @@ public class RequestFactory implements EntryPoint {
        * Fired when the user clicks on the sendButton.
        */
       public void onClick(ClickEvent event) {
-        sendNameToServer();
+        //sendNameToServer();
+        userServiceRequestFactory.userServiceRequest().findById(1L).fire(
+			new Receiver<UserProxy>() {
+			  @Override
+			  public void onSuccess(UserProxy user) {
+				dialogBox.setText("RequestFcatory Call");
+				serverResponseLabel.removeStyleName("serverResponseLabelError");
+				serverResponseLabel.setHTML("Username: "+user.getName());
+				dialogBox.center();
+				closeButton.setFocus(true);
+			  }
+			});
       }
 
       /**
@@ -100,7 +120,7 @@ public class RequestFactory implements EntryPoint {
        */
       public void onKeyUp(KeyUpEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          sendNameToServer();
+          //sendNameToServer();
         }
       }
 
